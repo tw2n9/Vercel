@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Barbeiro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="loginView" class="login-shell">
+    <section class="login-card">
+      <div class="brand">
+        <span class="brand-mark">B</span>
+        <div>
+          <strong>Área do Barbeiro</strong>
+          <span>Agenda e atendimentos</span>
+        </div>
+      </div>
+
+      <form id="loginForm" class="stack-form">
+        <label>E-mail<input id="loginEmail" type="email" value="barbeiro.demo@barbearia.local" required></label>
+        <label>Senha<input id="loginPassword" type="password" value="barber123" required></label>
+        <button class="button primary" type="submit">Entrar</button>
+        <p id="loginMessage" class="form-message"></p>
+      </form>
+    </section>
+  </main>
+
+  <main id="appView" class="app-shell hidden">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">B</span>
+        <div>
+          <strong id="barberName">Barbeiro</strong>
+          <span>Agenda do dia</span>
+        </div>
+      </div>
+      <button id="logoutButton" class="button secondary" type="button">Sair</button>
+    </header>
+
+    <section class="content">
+      <div class="page-heading">
+        <p class="eyebrow">Atendimentos</p>
+        <h1>Minha agenda</h1>
+      </div>
+
+      <section class="toolbar panel">
+        <label>Data<input id="agendaDate" type="date"></label>
+        <button id="refreshAgenda" class="button primary" type="button">Atualizar</button>
+      </section>
+
+      <section class="metric-grid">
+        <article class="metric-card">
+          <span>Total</span>
+          <strong id="metricTotal">0</strong>
+        </article>
+        <article class="metric-card">
+          <span>Agendados</span>
+          <strong id="metricScheduled">0</strong>
+        </article>
+        <article class="metric-card">
+          <span>Concluídos</span>
+          <strong id="metricCompleted">0</strong>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Horários</h2>
+          <p id="agendaHint">Selecione uma data para ver a agenda.</p>
+        </div>
+        <div id="agendaList" class="agenda-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
