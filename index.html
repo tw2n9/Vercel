@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barbearia MVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="authView" class="auth-shell">
+    <section class="hero-copy">
+      <div class="brand">
+        <span class="brand-mark">B</span>
+        <span>Barbearia MVP</span>
+      </div>
+      <h1>Agende seu horário sem complicação.</h1>
+      <p>Escolha serviço, barbeiro, data e horário em poucos minutos.</p>
+    </section>
+
+    <section class="auth-panel">
+      <div class="tabs">
+        <button class="tab active" data-auth-tab="login">Entrar</button>
+        <button class="tab" data-auth-tab="register">Criar conta</button>
+      </div>
+
+      <form id="loginForm" class="auth-form active">
+        <label>E-mail<input id="loginEmail" type="email" required></label>
+        <label>Senha<input id="loginPassword" type="password" required></label>
+        <button class="button primary" type="submit">Entrar</button>
+        <p id="loginMessage" class="form-message"></p>
+      </form>
+
+      <form id="registerForm" class="auth-form">
+        <label>Nome<input id="registerName" required></label>
+        <label>Telefone<input id="registerPhone" required></label>
+        <label>E-mail<input id="registerEmail" type="email" required></label>
+        <label>Senha<input id="registerPassword" type="password" required></label>
+        <button class="button primary" type="submit">Criar conta</button>
+        <p id="registerMessage" class="form-message"></p>
+      </form>
+    </section>
+  </main>
+
+  <main id="appView" class="app-shell hidden">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">B</span>
+        <span>Barbearia MVP</span>
+      </div>
+      <button id="logoutButton" class="icon-button" type="button" title="Sair">Sair</button>
+    </header>
+
+    <section id="home" class="view active">
+      <div class="page-heading">
+        <p class="eyebrow">Bem-vindo</p>
+        <h1 id="homeTitle">Agende seu próximo corte</h1>
+      </div>
+
+      <article id="nextBookingCard" class="highlight-card"></article>
+
+      <div class="quick-actions">
+        <button class="action-card" data-view-target="booking">
+          <strong>Agendar</strong>
+          <span>Escolher serviço e horário</span>
+        </button>
+        <button class="action-card" data-view-target="reservations">
+          <strong>Reservas</strong>
+          <span>Ver próximos horários</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="booking" class="view">
+      <div class="page-heading">
+        <p class="eyebrow">Agendamento</p>
+        <h1>Escolha seu horário</h1>
+      </div>
+
+      <div class="booking-layout">
+        <section class="panel">
+          <div class="step-heading">
+            <span>1</span>
+            <h2>Serviço</h2>
+          </div>
+          <div id="servicesList" class="card-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="step-heading">
+            <span>2</span>
+            <h2>Barbeiro</h2>
+          </div>
+          <div id="barbersList" class="card-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="step-heading">
+            <span>3</span>
+            <h2>Data e horário</h2>
+          </div>
+          <label>Data<input id="bookingDate" type="date"></label>
+          <div id="slotsList" class="slots-grid"></div>
+        </section>
+
+        <aside class="panel summary-panel">
+          <h2>Resumo</h2>
+          <dl>
+            <div><dt>Serviço</dt><dd id="summaryService">-</dd></div>
+            <div><dt>Barbeiro</dt><dd id="summaryBarber">-</dd></div>
+            <div><dt>Data</dt><dd id="summaryDate">-</dd></div>
+            <div><dt>Horário</dt><dd id="summarySlot">-</dd></div>
+            <div><dt>Valor</dt><dd id="summaryPrice">-</dd></div>
+          </dl>
+          <button id="confirmBooking" class="button primary full" type="button">Confirmar reserva</button>
+          <p id="bookingMessage" class="form-message"></p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="reservations" class="view">
+      <div class="page-heading">
+        <p class="eyebrow">Agenda</p>
+        <h1>Minhas reservas</h1>
+      </div>
+      <div id="reservationsList" class="reservation-list"></div>
+    </section>
+
+    <section id="profile" class="view">
+      <div class="page-heading">
+        <p class="eyebrow">Conta</p>
+        <h1>Meu perfil</h1>
+      </div>
+      <section class="panel narrow">
+        <form id="profileForm" class="stack-form">
+          <label>Nome<input id="profileName" required></label>
+          <label>Telefone<input id="profilePhone" required></label>
+          <label>E-mail<input id="profileEmail" type="email" disabled></label>
+          <button class="button primary" type="submit">Salvar</button>
+          <p id="profileMessage" class="form-message"></p>
+        </form>
+      </section>
+    </section>
+
+    <nav class="bottom-nav">
+      <button class="bottom-item active" data-view-target="home">Home</button>
+      <button class="bottom-item" data-view-target="booking">Agendar</button>
+      <button class="bottom-item" data-view-target="reservations">Reservas</button>
+      <button class="bottom-item" data-view-target="profile">Perfil</button>
+    </nav>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
