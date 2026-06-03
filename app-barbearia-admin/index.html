@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - Barbearia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="loginView" class="login-shell">
+    <section class="login-panel">
+      <div class="brand-lockup">
+        <span class="brand-mark">B</span>
+        <div>
+          <strong>Barbearia MVP</strong>
+          <span>Painel administrativo</span>
+        </div>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <h1>Entrar</h1>
+        <p>Acesse com o usuário administrador criado no backend.</p>
+
+        <label>
+          E-mail
+          <input id="loginEmail" type="email" value="admin@barbearia.local" required>
+        </label>
+
+        <label>
+          Senha
+          <input id="loginPassword" type="password" value="admin123" required>
+        </label>
+
+        <button class="button primary" type="submit">Entrar</button>
+        <p id="loginMessage" class="form-message"></p>
+      </form>
+    </section>
+  </main>
+
+  <main id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand-lockup compact">
+        <span class="brand-mark">B</span>
+        <div>
+          <strong>Barbearia</strong>
+          <span>Admin</span>
+        </div>
+      </div>
+
+      <nav class="nav-list" aria-label="Menu administrativo">
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="agenda">Agenda</button>
+        <button class="nav-item" data-view="servicos">Serviços</button>
+        <button class="nav-item" data-view="barbeiros">Barbeiros</button>
+        <button class="nav-item" data-view="horarios">Horários</button>
+        <button class="nav-item" data-view="configuracoes">Configurações</button>
+      </nav>
+
+      <button id="logoutButton" class="button secondary full">Sair</button>
+    </aside>
+
+    <section class="content-shell">
+      <header class="topbar">
+        <div>
+          <p id="sectionEyebrow" class="eyebrow">Operação</p>
+          <h1 id="sectionTitle">Dashboard</h1>
+        </div>
+        <div class="api-status">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="apiStatusText">API conectada</span>
+        </div>
+      </header>
+
+      <section id="dashboard" class="view active">
+        <div class="metric-grid">
+          <article class="metric-card">
+            <span>Serviços</span>
+            <strong id="metricServices">0</strong>
+          </article>
+          <article class="metric-card">
+            <span>Barbeiros</span>
+            <strong id="metricBarbers">0</strong>
+          </article>
+          <article class="metric-card">
+            <span>Agenda hoje</span>
+            <strong id="metricBookings">0</strong>
+          </article>
+          <article class="metric-card">
+            <span>Horários abertos</span>
+            <strong id="metricHours">0</strong>
+          </article>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Próximos atendimentos</h2>
+              <p>Reservas encontradas para a data selecionada.</p>
+            </div>
+            <input id="dashboardDate" type="date">
+          </div>
+          <div id="dashboardBookings" class="table-wrap"></div>
+        </section>
+      </section>
+
+      <section id="agenda" class="view">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Agenda geral</h2>
+              <p>Filtre por data e barbeiro.</p>
+            </div>
+            <div class="inline-controls">
+              <input id="agendaDate" type="date">
+              <select id="agendaBarber"></select>
+              <button id="refreshAgenda" class="button secondary" type="button">Atualizar</button>
+            </div>
+          </div>
+          <div id="agendaTable" class="table-wrap"></div>
+        </section>
+      </section>
+
+      <section id="servicos" class="view">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Serviços</h2>
+                <p>Serviços disponíveis para agendamento.</p>
+              </div>
+              <button id="refreshServices" class="button secondary" type="button">Atualizar</button>
+            </div>
+            <div id="servicesTable" class="table-wrap"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header compact-header">
+              <h2 id="serviceFormTitle">Novo serviço</h2>
+            </div>
+            <form id="serviceForm" class="stack-form">
+              <input id="serviceId" type="hidden">
+              <label>Nome<input id="serviceName" required></label>
+              <label>Descrição<textarea id="serviceDescription" rows="3"></textarea></label>
+              <div class="two-cols">
+                <label>Preço<input id="servicePrice" type="number" min="0" step="0.01" required></label>
+                <label>Duração<input id="serviceDuration" type="number" min="1" step="1" required></label>
+              </div>
+              <label class="check-row"><input id="serviceActive" type="checkbox" checked> Ativo</label>
+              <div class="form-actions">
+                <button class="button primary" type="submit">Salvar</button>
+                <button id="clearServiceForm" class="button secondary" type="button">Limpar</button>
+              </div>
+              <p id="serviceMessage" class="form-message"></p>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <section id="barbeiros" class="view">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Barbeiros</h2>
+                <p>Profissionais cadastrados.</p>
+              </div>
+              <button id="refreshBarbers" class="button secondary" type="button">Atualizar</button>
+            </div>
+            <div id="barbersTable" class="table-wrap"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header compact-header">
+              <h2>Novo barbeiro</h2>
+            </div>
+            <form id="barberForm" class="stack-form">
+              <label>Nome completo<input id="barberName" required></label>
+              <label>Nome público<input id="barberPublicName" required></label>
+              <label>E-mail<input id="barberEmail" type="email" required></label>
+              <label>Telefone<input id="barberPhone" required></label>
+              <label>Senha inicial<input id="barberPassword" type="password" value="barber123" required></label>
+              <label>Especialidade<input id="barberSpecialty"></label>
+              <label class="check-row"><input id="barberActive" type="checkbox" checked> Ativo</label>
+              <button class="button primary" type="submit">Criar barbeiro</button>
+              <p id="barberMessage" class="form-message"></p>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <section id="horarios" class="view">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Funcionamento</h2>
+                <p>Configure os horários gerais da barbearia.</p>
+              </div>
+              <button id="saveBusinessHours" class="button primary" type="button">Salvar horários</button>
+            </div>
+            <div id="businessHoursForm" class="hours-grid"></div>
+            <p id="hoursMessage" class="form-message"></p>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header compact-header">
+              <h2>Bloquear horário</h2>
+            </div>
+            <form id="blockForm" class="stack-form">
+              <label>Barbeiro<select id="blockBarber"></select></label>
+              <label>Data<input id="blockDate" type="date" required></label>
+              <div class="two-cols">
+                <label>Início<input id="blockStart" type="time" required></label>
+                <label>Fim<input id="blockEnd" type="time" required></label>
+              </div>
+              <label>Motivo<input id="blockReason"></label>
+              <button class="button primary" type="submit">Criar bloqueio</button>
+              <p id="blockMessage" class="form-message"></p>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <section id="configuracoes" class="view">
+        <section class="panel narrow">
+          <div class="panel-header compact-header">
+            <h2>Configurações da barbearia</h2>
+          </div>
+          <form id="settingsForm" class="stack-form">
+            <label>Nome da barbearia<input id="businessName" required></label>
+            <label>Telefone<input id="businessPhone"></label>
+            <label>Endereço<textarea id="businessAddress" rows="3"></textarea></label>
+            <div class="two-cols">
+              <label>Cancelamento mínimo<input id="cancelLimit" type="number" min="0"></label>
+              <label>Intervalo da agenda<input id="slotInterval" type="number" min="1"></label>
+            </div>
+            <label>Política de cancelamento<textarea id="cancelPolicy" rows="3"></textarea></label>
+            <button class="button primary" type="submit">Salvar configurações</button>
+            <p id="settingsMessage" class="form-message"></p>
+          </form>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
