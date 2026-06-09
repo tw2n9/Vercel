@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Área do Barbeiro</title>
+  <title>Assinou - Barbeiro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,20 +11,47 @@
 </head>
 <body>
   <main id="loginView" class="login-shell">
+    <section class="login-copy" aria-labelledby="barberHeroTitle">
+      <p class="eyebrow">Painel do barbeiro</p>
+      <h1 id="barberHeroTitle">Agenda clara para atender melhor.</h1>
+      <p>Veja reservas do dia, acompanhe status dos atendimentos e organize seus horários de trabalho em um só lugar.</p>
+      <div class="hero-proof">
+        <span>Agenda diária</span>
+        <span>Horários editáveis</span>
+        <span>Controle de presença</span>
+      </div>
+    </section>
+
     <section class="login-card">
       <div class="brand">
-        <span class="brand-mark">B</span>
+        <span class="brand-mark">A</span>
         <div>
-          <strong>Área do Barbeiro</strong>
+          <strong>Assinou</strong>
           <span>Agenda e atendimentos</span>
         </div>
       </div>
 
-      <form id="loginForm" class="stack-form">
-        <label>E-mail<input id="loginEmail" type="email" value="barbeiro.demo@barbearia.local" required></label>
-        <label>Senha<input id="loginPassword" type="password" value="barber123" required></label>
+      <div class="auth-tabs" aria-label="Acesso do barbeiro">
+        <button class="auth-tab active" type="button" data-auth-panel="login">Entrar</button>
+        <button class="auth-tab" type="button" data-auth-panel="register">Criar conta</button>
+      </div>
+
+      <form id="loginForm" class="stack-form auth-pane active">
+        <label>E-mail<input id="loginEmail" type="email" required></label>
+        <label>Senha<input id="loginPassword" type="password" required></label>
         <button class="button primary" type="submit">Entrar</button>
         <p id="loginMessage" class="form-message"></p>
+      </form>
+
+      <form id="registerForm" class="stack-form auth-pane">
+        <h2>Criar conta de barbeiro</h2>
+        <label>Nome completo<input id="registerName" type="text" required></label>
+        <label>Nome publico<input id="registerPublicName" type="text" required></label>
+        <label>E-mail<input id="registerEmail" type="email" required></label>
+        <label>Telefone<input id="registerPhone" type="tel" required></label>
+        <label>Senha<input id="registerPassword" type="password" minlength="6" required></label>
+        <button class="button secondary" type="submit">Cadastrar barbeiro</button>
+        <p id="registerMessage" class="form-message"></p>
       </form>
     </section>
   </main>
@@ -32,7 +59,7 @@
   <main id="appView" class="app-shell hidden">
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark">B</span>
+        <span class="brand-mark">A</span>
         <div>
           <strong id="barberName">Barbeiro</strong>
           <span>Agenda do dia</span>
@@ -73,6 +100,22 @@
           <p id="agendaHint">Selecione uma data para ver a agenda.</p>
         </div>
         <div id="agendaList" class="agenda-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Meus horarios</h2>
+          <p>Defina quantos blocos de atendimento quiser por dia.</p>
+        </div>
+        <div class="duration-row">
+          <label>Tempo de cada corte em minutos<input id="defaultServiceDuration" type="number" min="1" step="1" placeholder="Ex: 30"></label>
+          <button id="saveBarberProfile" class="button secondary" type="button">Salvar tempo</button>
+        </div>
+        <div id="workingHoursForm" class="hours-list"></div>
+        <div class="panel-actions">
+          <button id="saveWorkingHours" class="button primary" type="button">Salvar horarios</button>
+          <p id="workingHoursMessage" class="form-message"></p>
+        </div>
       </section>
     </section>
   </main>
