@@ -3,7 +3,7 @@ import { pool, query } from "./pool";
 
 async function seedAdmin() {
   const name = process.env.ADMIN_NAME ?? "Admin Barbearia";
-  const email = process.env.ADMIN_EMAIL ?? "admin@barbearia.local";
+  const email = process.env.ADMIN_EMAIL ?? "marcovinicius200798@gmail.com";
   const phone = process.env.ADMIN_PHONE ?? "+5500000000000";
   const password = process.env.ADMIN_PASSWORD ?? "admin123";
 

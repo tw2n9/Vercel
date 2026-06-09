@@ -48,7 +48,7 @@ npm run db:seed-services
 Credenciais padrao do `.env` de desenvolvimento:
 
 ```text
-admin@barbearia.local
+marcovinicius200798@gmail.com
 admin123
 ```
 

@@ -1,8 +1,11 @@
 const API_URL = window.BARBEARIA_API_URL || localStorage.getItem("barbearia_api_url") || "http://localhost:3000/api/v1";
+const WHATSAPP_URL = window.ASSINOU_WHATSAPP_URL || "";
 
 const state = {
   token: localStorage.getItem("barbearia_cliente_token"),
   user: null,
+  barbershops: [],
+  selectedBarbershop: JSON.parse(localStorage.getItem("barbearia_selected_shop") || "null"),
   services: [],
   barbers: [],
   reservations: [],
@@ -47,17 +50,35 @@ function money(value) {
   return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function runViewTransition(callback) {
+  if (document.startViewTransition && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.startViewTransition(callback);
+    return;
+  }
+
+  callback();
+}
+
 function setAuthTab(tab) {
-  document.querySelectorAll(".tab").forEach((button) => button.classList.toggle("active", button.dataset.authTab === tab));
-  document.querySelectorAll(".auth-form").forEach((form) => form.classList.remove("active"));
-  document.querySelector(`#${tab}Form`).classList.add("active");
+  runViewTransition(() => {
+    document.querySelectorAll(".tab").forEach((button) => button.classList.toggle("active", button.dataset.authTab === tab));
+    document.querySelectorAll(".auth-form").forEach((form) => form.classList.remove("active"));
+    document.querySelector(`#${tab}Form`).classList.add("active");
+  });
 }
 
 function setView(view) {
-  document.querySelectorAll(".view").forEach((item) => item.classList.remove("active"));
-  document.querySelector(`#${view}`).classList.add("active");
-  document.querySelectorAll("[data-view-target]").forEach((item) => {
-    item.classList.toggle("active", item.dataset.viewTarget === view);
+  if (view === "booking" && !state.selectedBarbershop) {
+    showMessage(document.querySelector("#barbershopMessage"), "Escolha uma barbearia cadastrada antes de agendar.", true);
+    view = "home";
+  }
+
+  runViewTransition(() => {
+    document.querySelectorAll(".view").forEach((item) => item.classList.remove("active"));
+    document.querySelector(`#${view}`).classList.add("active");
+    document.querySelectorAll("[data-view-target]").forEach((item) => {
+      item.classList.toggle("active", item.dataset.viewTarget === view);
+    });
   });
 
   if (view === "reservations") loadReservations();
@@ -85,6 +106,7 @@ async function initializeApp() {
     document.querySelector("#profilePhone").value = state.user.phone;
     document.querySelector("#profileEmail").value = state.user.email;
 
+    await loadBarbershops();
     await Promise.all([loadServices(), loadBarbers(), loadReservations()]);
     renderNextBooking();
   } catch (error) {
@@ -93,8 +115,37 @@ async function initializeApp() {
   }
 }
 
+async function loadBarbershops() {
+  const city = document.querySelector("#citySearch").value.trim();
+  const stateSearch = document.querySelector("#stateSearch").value.trim().toUpperCase();
+  const params = new URLSearchParams();
+  if (city) params.set("city", city);
+  if (stateSearch) params.set("state", stateSearch);
+
+  const response = await api(`/barbershops?${params.toString()}`);
+  state.barbershops = response.data || [];
+  renderBarbershops();
+}
+
+function renderBarbershops() {
+  document.querySelector("#barbershopsList").innerHTML = state.barbershops.map((shop) => `
+    <button class="select-card ${state.selectedBarbershop?.id === shop.id ? "active" : ""}" data-barbershop-id="${shop.id}">
+      <strong>${shop.name}</strong>
+      <span>${shop.city} - ${shop.state}</span>
+      <span>${shop.address || shop.phone || "Barbearia cadastrada"}</span>
+    </button>
+  `).join("") || `<p class="form-message">Nenhuma barbearia cadastrada encontrada para esta busca.</p>`;
+  updateSummary();
+}
+
 async function loadServices() {
-  const response = await api("/services");
+  if (!state.selectedBarbershop) {
+    state.services = [];
+    renderServices();
+    return;
+  }
+
+  const response = await api(`/services?barbershopId=${state.selectedBarbershop.id}`);
   state.services = response.data || [];
   renderServices();
 }
@@ -111,7 +162,13 @@ function renderServices() {
 }
 
 async function loadBarbers() {
-  const response = await api("/barbers");
+  if (!state.selectedBarbershop) {
+    state.barbers = [];
+    renderBarbers();
+    return;
+  }
+
+  const response = await api(`/barbers?barbershopId=${state.selectedBarbershop.id}`);
   state.barbers = response.data || [];
   renderBarbers();
 }
@@ -129,8 +186,8 @@ function renderBarbers() {
 async function loadSlots() {
   const container = document.querySelector("#slotsList");
 
-  if (!state.selectedService || !state.selectedBarber || !state.selectedDate) {
-    container.innerHTML = `<p class="form-message">Escolha serviço e barbeiro para ver horários.</p>`;
+  if (!state.selectedBarbershop || !state.selectedService || !state.selectedBarber || !state.selectedDate) {
+    container.innerHTML = `<p class="form-message">Escolha barbearia, serviço e barbeiro para ver horários.</p>`;
     return;
   }
 
@@ -138,6 +195,7 @@ async function loadSlots() {
 
   try {
     const params = new URLSearchParams({
+      barbershopId: state.selectedBarbershop.id,
       serviceId: state.selectedService.id,
       barberId: state.selectedBarber.id,
       date: state.selectedDate
@@ -227,6 +285,7 @@ function formatDate(value) {
 }
 
 function updateSummary() {
+  document.querySelector("#summaryBarbershop").textContent = state.selectedBarbershop?.name || "-";
   document.querySelector("#summaryService").textContent = state.selectedService?.name || "-";
   document.querySelector("#summaryBarber").textContent = state.selectedBarber?.publicName || "-";
   document.querySelector("#summaryDate").textContent = state.selectedDate || "-";
@@ -252,6 +311,19 @@ document.querySelectorAll("[data-view-target]").forEach((button) => {
 document.body.addEventListener("click", async (event) => {
   const viewTarget = event.target.dataset.viewTarget;
   if (viewTarget) setView(viewTarget);
+
+  const barbershopId = event.target.closest("[data-barbershop-id]")?.dataset.barbershopId;
+  if (barbershopId) {
+    state.selectedBarbershop = state.barbershops.find((shop) => shop.id === barbershopId);
+    localStorage.setItem("barbearia_selected_shop", JSON.stringify(state.selectedBarbershop));
+    state.selectedService = null;
+    state.selectedBarber = null;
+    state.selectedSlot = null;
+    renderBarbershops();
+    await Promise.all([loadServices(), loadBarbers()]);
+    await loadSlots();
+    showMessage(document.querySelector("#barbershopMessage"), "Barbearia selecionada.");
+  }
 
   const serviceId = event.target.closest("[data-service-id]")?.dataset.serviceId;
   if (serviceId) {
@@ -339,11 +411,20 @@ document.querySelector("#bookingDate").addEventListener("change", async (event) 
   await loadSlots();
 });
 
+document.querySelector("#findBarbershops").addEventListener("click", async () => {
+  try {
+    await loadBarbershops();
+    showMessage(document.querySelector("#barbershopMessage"), "");
+  } catch (error) {
+    showMessage(document.querySelector("#barbershopMessage"), error.message, true);
+  }
+});
+
 document.querySelector("#confirmBooking").addEventListener("click", async () => {
   const message = document.querySelector("#bookingMessage");
 
-  if (!state.selectedService || !state.selectedBarber || !state.selectedDate || !state.selectedSlot) {
-    showMessage(message, "Escolha serviço, barbeiro, data e horário.", true);
+  if (!state.selectedBarbershop || !state.selectedService || !state.selectedBarber || !state.selectedDate || !state.selectedSlot) {
+    showMessage(message, "Escolha barbearia, serviço, barbeiro, data e horário.", true);
     return;
   }
 
@@ -351,6 +432,7 @@ document.querySelector("#confirmBooking").addEventListener("click", async () => 
     const response = await api("/bookings", {
       method: "POST",
       body: JSON.stringify({
+        barbershopId: state.selectedBarbershop.id,
         serviceId: state.selectedService.id,
         barberId: state.selectedBarber.id,
         date: state.selectedDate,
@@ -388,5 +470,43 @@ document.querySelector("#profileForm").addEventListener("submit", async (event) 
 });
 
 document.querySelector("#logoutButton").addEventListener("click", logout);
+
+const whatsappLink = document.querySelector(".whatsapp-float");
+if (whatsappLink) {
+  whatsappLink.href = WHATSAPP_URL;
+}
+
+const cookieBanner = document.querySelector("#cookieBanner");
+const cookieChoice = localStorage.getItem("assinou_cookie_choice");
+if (cookieBanner && !cookieChoice) {
+  cookieBanner.classList.add("show");
+}
+
+document.querySelector("#acceptCookies")?.addEventListener("click", () => {
+  localStorage.setItem("assinou_cookie_choice", "accepted");
+  cookieBanner?.classList.remove("show");
+});
+
+document.querySelector("#rejectCookies")?.addEventListener("click", () => {
+  localStorage.setItem("assinou_cookie_choice", "rejected");
+  cookieBanner?.classList.remove("show");
+});
+
+const revealTargets = document.querySelectorAll(".public-section, .feature-card, .public-footer, .finder-panel, .quick-actions");
+if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  revealTargets.forEach((element) => element.classList.add("scroll-reveal"));
+
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add("revealed");
+      observer.unobserve(entry.target);
+    }
+  }, { threshold: 0.18 });
+
+  revealTargets.forEach((element) => revealObserver.observe(element));
+} else {
+  revealTargets.forEach((element) => element.classList.add("revealed"));
+}
 
 updateAuthView();
